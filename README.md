@@ -1,6 +1,6 @@
 # TTS9000
 
-Text-to-Speech service using Mistral's Voxtral TTS. Extracts article text from URLs, cleans it with Mistral, and converts to audio.
+Telegram bot that converts articles to audio using Mistral's Voxtral TTS. Extracts article text from URLs, cleans it with Mistral, and converts to audio.
 
 ## Requirements
 
@@ -10,9 +10,7 @@ Text-to-Speech service using Mistral's Voxtral TTS. Extracts article text from U
 
 ## Features
 
-- Web server with `/generate?url=<URL>` endpoint
 - Telegram bot for URL processing
-- CLI for direct URL processing
 - Automatic language detection (English/French)
 - Caching of generated audio files
 - Proper audio duration calculation using ffmpeg
@@ -24,9 +22,7 @@ Text-to-Speech service using Mistral's Voxtral TTS. Extracts article text from U
 ### Environment Variables
 
 - `MISTRAL_API_KEY`: Required for Mistral API access
-- `TELEGRAM_BOT_TOKEN`: Required for Telegram bot mode
-- `MODE`: Set to `cli`, `server`, or `telegram` (default: `cli`)
-- `PORT`: Set to change the server port (default: `8000`)
+- `TELEGRAM_BOT_TOKEN`: Required for Telegram bot
 
 ### Docker
 
@@ -34,14 +30,8 @@ Text-to-Speech service using Mistral's Voxtral TTS. Extracts article text from U
 # Build
 docker build -t tts9000 .
 
-# Run as web server
-docker run -p 8000:8000 -e MISTRAL_API_KEY=your_key tts9000
-
 # Run as Telegram bot
-docker run -e MISTRAL_API_KEY=your_key -e TELEGRAM_BOT_TOKEN=your_token -e MODE=telegram tts9000
-
-# Run as CLI
-docker run -e MISTRAL_API_KEY=your_key tts9000 --mode cli https://example.com/article
+docker run -e MISTRAL_API_KEY=your_key -e TELEGRAM_BOT_TOKEN=your_token tts9000
 ```
 
 ### Direct Execution
@@ -50,23 +40,9 @@ docker run -e MISTRAL_API_KEY=your_key tts9000 --mode cli https://example.com/ar
 # Install dependencies
 uv sync
 
-# CLI mode (default)
-uv run main.py https://example.com/article
-
-# Web server mode
-uv run main.py --mode server
-
-# Telegram bot mode
-uv run main.py --mode telegram
+# Run Telegram bot
+uv run main.py
 ```
-
-### API Endpoint
-
-```
-GET /generate?url=<URL>
-```
-
-Returns MP3 audio file directly.
 
 ### Telegram Bot
 

@@ -1,13 +1,16 @@
 # TTS9000 Agent Instructions
 
 ## Identity
-You are TTS9000, a Text-to-Speech service assistant. Your primary function is to help users with the TTS9000 application.
+You are TTS9000, a Telegram bot that converts articles to audio using Mistral's Voxtral TTS.
 
 ## Application Overview
 See README.md for full documentation.
 
-## Key Features
-See README.md for feature list.
+## Error Handling
+- 403 errors: Typically Cloudflare or similar protection
+- 4xx errors: Client errors (bad URL, etc.)
+- 5xx errors: Server errors
+- Always check MISTRAL_API_KEY is set
 
 ## Dependencies
 See pyproject.toml for full dependency list.
