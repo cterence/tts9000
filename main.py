@@ -194,8 +194,9 @@ def get_article_title(url, api_key):
 async def handle_url(update: Update, _):
     """Handle URL messages."""
     allowed_users = os.getenv("ALLOWED_USERS", "").split(",")
-    username = str(update.message.from_user.username)
+    username = update.message.from_user.username or ""
     if allowed_users and username not in allowed_users:
+        logger.warning("Unauthorized access attempt by user: %s", username)
         await update.message.reply_text("🚫 You are not authorized to use this bot.")
         return
     url = update.message.text
@@ -213,14 +214,15 @@ async def handle_url(update: Update, _):
         return
 
     try:
-        msg = await update.message.reply_text(f"🔍 Extracting text from {url}...")
+        msg = await update.message.reply_text("🔍 Extracting text from webpage...")
         article_title = get_article_title(url, api_key)
-        await msg.edit_text("🧹 Cleaning text with Mistral...")
+        await msg.edit_text(f"🧹 Cleaning text for \"{article_title}\"...")
         audio_data = process_url(url, api_key)
-        await msg.edit_text(f"🎤 Generating TTS for {article_title}...")
+        await msg.edit_text("🎤 Generating TTS...")
         cache_file = get_cache_filename(url)
         temp_file = cache_file + ".temp"
         Path(temp_file).write_bytes(audio_data)
+        await msg.edit_text("🔧 Fixing audio header...")
         try:
             (
                 ffmpeg
