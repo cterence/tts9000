@@ -126,11 +126,11 @@ def process_url(url, api_key):
     cache_dir = Path("generated")
     cache_dir.mkdir(exist_ok=True)
     cache_file = Path(get_cache_filename(url))
-    
+
     if cache_file.exists():
         print(f"Using cached file: {cache_file}")
         return cache_file.read_bytes()
-    
+
     raw_text = extract_article_text(url)
     clean_text = clean_text_with_mistral(raw_text, api_key)
     audio_data = generate_tts(clean_text, api_key)
@@ -144,6 +144,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
 
 
 @app.get("/generate")
@@ -267,7 +272,7 @@ Examples:
         if not args.url:
             print("Usage: uv run main.py [--mode cli|server|telegram] <URL>")
             sys.exit(1)
-        
+
         url = args.url
         api_key = os.getenv("MISTRAL_API_KEY")
         if not api_key:
