@@ -23,6 +23,7 @@ Telegram bot that converts articles to audio using Mistral's Voxtral TTS. Extrac
 
 - `MISTRAL_API_KEY`: Required for Mistral API access
 - `TELEGRAM_BOT_TOKEN`: Required for Telegram bot
+- `ALLOWED_USERS`: Comma-separated list of Telegram usernames allowed to use the bot (empty = all users allowed)
 
 ### Docker
 

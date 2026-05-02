@@ -193,6 +193,11 @@ def get_article_title(url, api_key):
 
 async def handle_url(update: Update, _):
     """Handle URL messages."""
+    allowed_users = os.getenv("ALLOWED_USERS", "").split(",")
+    username = str(update.message.from_user.username)
+    if allowed_users and username not in allowed_users:
+        await update.message.reply_text("🚫 You are not authorized to use this bot.")
+        return
     url = update.message.text
     if not (url.startswith("http://") or url.startswith("https://")):
         await update.message.reply_text(
