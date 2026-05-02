@@ -185,6 +185,7 @@ def get_article_title(url, api_key):
             temperature=0.1,
         )
         title = response.choices[0].message.content.strip()
+        title = title.encode("latin1").decode("utf-8", errors="replace")
         return title if title else "article"
     except Exception as e:  # pylint: disable=broad-exception-caught
         logger.warning("Title extraction failed: %s", str(e))
@@ -216,7 +217,7 @@ async def handle_url(update: Update, _):
     try:
         msg = await update.message.reply_text("🔍 Extracting text from webpage...")
         article_title = get_article_title(url, api_key)
-        await msg.edit_text(f"🧹 Cleaning text for \"{article_title}\"...")
+        await msg.edit_text(f"🧹 Cleaning text for {article_title}...")
         audio_data = process_url(url, api_key)
         await msg.edit_text("🎤 Generating TTS...")
         cache_file = get_cache_filename(url)
