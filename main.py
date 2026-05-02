@@ -19,13 +19,13 @@ from telegram.ext import (
     filters,
     ContextTypes,
 )
-from mutagen.mp3 import MP3
 import io
 
 
 def extract_article_text(url):
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
     try:
-        response = requests.get(url, timeout=30)
+        response = requests.get(url, headers=headers, timeout=30)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         return soup.get_text(separator="\n", strip=True)
@@ -209,14 +209,32 @@ async def handle_url(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     try:
-        await update.message.reply_text(f"Processing {url}...")
+        msg = await update.message.reply_text(f"Extracting text from {url}...")
         article_title = get_article_title(url, api_key)
+        await msg.edit_text(f"Generating TTS for {article_title}...")
         audio_data = process_url(url, api_key)
-        audio_io = io.BytesIO(audio_data)
-        audio_info = MP3(audio_io)
-        duration = audio_info.info.length
+        import ffmpeg
+        cache_file = get_cache_filename(url)
+        temp_file = cache_file + ".temp"
+        Path(temp_file).write_bytes(audio_data)
+        cache_file = get_cache_filename(url)
+        try:
+            (
+                ffmpeg
+                .input(temp_file)
+                .output(cache_file, acodec='copy')
+                .run(overwrite_output=True, capture_stdout=True, capture_stderr=True)
+            )
+        except ffmpeg.Error as e:
+            logger.error(f"ffmpeg error: {e.stderr.decode()}")
+            raise
+        probe = ffmpeg.probe(cache_file)
+        duration = int(float(probe['format']['duration']))
+        logger.info(f"Audio duration: {duration}s")
+        Path(temp_file).unlink()
+        await msg.delete()
         await update.message.reply_audio(
-            audio=audio_data, title=article_title, duration=duration
+            audio=Path(cache_file).read_bytes(), title=article_title, duration=duration
         )
     except Exception as e:
         logger.error(f"Error processing URL for Telegram: {str(e)}")

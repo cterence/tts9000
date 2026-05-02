@@ -2,6 +2,12 @@
 
 Text-to-Speech service using Mistral's Voxtral TTS. Extracts article text from URLs, cleans it with Mistral, and converts to audio.
 
+## Requirements
+
+- Python 3.13+
+- [uv](https://github.com/astral-sh/uv) (recommended)
+- ffmpeg (for audio processing)
+
 ## Features
 
 - Web server with `/generate?url=<URL>` endpoint
@@ -9,7 +15,9 @@ Text-to-Speech service using Mistral's Voxtral TTS. Extracts article text from U
 - CLI for direct URL processing
 - Automatic language detection (English/French)
 - Caching of generated audio files
-- Proper audio duration calculation
+- Proper audio duration calculation using ffmpeg
+- MP3 header fixing for accurate duration in Telegram
+- Progress updates in Telegram bot
 
 ## Usage
 
@@ -18,6 +26,7 @@ Text-to-Speech service using Mistral's Voxtral TTS. Extracts article text from U
 - `MISTRAL_API_KEY`: Required for Mistral API access
 - `TELEGRAM_BOT_TOKEN`: Required for Telegram bot mode
 - `MODE`: Set to `cli`, `server`, or `telegram` (default: `cli`)
+- `PORT`: Set to change the server port (default: `8000`)
 
 ### Docker
 

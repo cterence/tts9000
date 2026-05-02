@@ -1,13 +1,22 @@
-FROM python:3.13-slim
+FROM python:3.13-alpine AS builder
 
 WORKDIR /app
 
-COPY pyproject.toml .
-RUN pip install uv && \
+COPY . .
+
+RUN apk add --no-cache ffmpeg && \
+    pip install uv && \
     uv pip compile pyproject.toml -o requirements.txt && \
     uv pip install --system -r requirements.txt
 
-COPY . .
+FROM python:3.13-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache ffmpeg
+
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /app .
 
 EXPOSE 8000
 
