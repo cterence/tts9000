@@ -195,8 +195,9 @@ def get_article_title(url, api_key):
 async def handle_url(update: Update, _):
     """Handle URL messages."""
     allowed_users = os.getenv("ALLOWED_USERS", "").split(",")
+    logger.info(allowed_users)
     user_id = update.message.from_user.id or ""
-    if allowed_users[0] != "" and user_id not in allowed_users:
+    if allowed_users[0] != "" and str(user_id) not in allowed_users:
         logger.warning("Unauthorized access attempt by user: %s", user_id)
         await update.message.reply_text("🚫 You are not authorized to use this bot.")
         return
