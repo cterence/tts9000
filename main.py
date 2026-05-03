@@ -11,6 +11,7 @@ from urllib.parse import urlparse, urlunparse
 import ffmpeg
 import requests
 from bs4 import BeautifulSoup
+from ftfy import fix_encoding
 from langdetect import LangDetectException, detect
 from mistralai.client import Mistral
 from telegram import Update
@@ -184,8 +185,7 @@ def get_article_title(url, api_key):
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1,
         )
-        title = response.choices[0].message.content.strip()
-        title = title.encode("latin1").decode("utf-8", errors="replace")
+        title = fix_encoding(response.choices[0].message.content.strip())
         return title if title else "article"
     except Exception as e:  # pylint: disable=broad-exception-caught
         logger.warning("Title extraction failed: %s", str(e))
@@ -195,9 +195,9 @@ def get_article_title(url, api_key):
 async def handle_url(update: Update, _):
     """Handle URL messages."""
     allowed_users = os.getenv("ALLOWED_USERS", "").split(",")
-    username = update.message.from_user.username or ""
-    if allowed_users and username not in allowed_users:
-        logger.warning("Unauthorized access attempt by user: %s", username)
+    user_id = update.message.from_user.id or ""
+    if allowed_users[0] != "" and user_id not in allowed_users:
+        logger.warning("Unauthorized access attempt by user: %s", user_id)
         await update.message.reply_text("🚫 You are not authorized to use this bot.")
         return
     url = update.message.text
