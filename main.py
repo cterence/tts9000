@@ -75,7 +75,8 @@ def clean_text_with_mistral(text, api_key):
     """Clean text using Mistral AI."""
     client = Mistral(api_key=api_key, timeout_ms=300000)
     prompt = (
-        "Remove all headers, footers, navigation menus, advertisements, "
+        "Your job is to process text that will be fed to a text-to-speech model."
+        "Remove all headers, footers, navigation menus, advertisements, image attributions "
         "and any non-article content from the following text. "
         "Return only the clean article text. "
         "Do not alter the text in any way (summarizing, adding parts, "
