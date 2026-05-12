@@ -1,4 +1,4 @@
-FROM python:3.13-alpine AS builder
+FROM python:3.14-alpine AS builder
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ RUN apk add --no-cache ffmpeg && \
     uv pip compile pyproject.toml -o requirements.txt && \
     uv pip install --system -r requirements.txt
 
-FROM python:3.13-alpine
+FROM python:3.14-alpine
 
 WORKDIR /app
 
